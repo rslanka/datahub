@@ -77,7 +77,7 @@ class KafkaSourceTest(unittest.TestCase):
             ctx,
         )
 
-        def new_get_latest_version(_):
+        def new_get_latest_version(subject_name:str) -> RegisteredSchema:
             return RegisteredSchema(
                 schema_id="schema_id_1",
                 schema=Schema(schema_str=schema_str_ref, schema_type="AVRO"),
