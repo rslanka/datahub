@@ -5,10 +5,7 @@ from hashlib import md5
 from typing import Dict, Iterable, List, Optional, Tuple, cast
 
 import confluent_kafka
-from confluent_kafka.schema_registry.schema_registry_client import (
-    Schema,
-    SchemaRegistryClient,
-)
+from confluent_kafka.schema_registry.schema_registry_client import Schema
 
 from datahub.configuration.common import AllowDenyPattern, ConfigurationError
 from datahub.configuration.kafka import KafkaConsumerConnectionConfig
@@ -114,11 +111,14 @@ class KafkaSource(StatefulIngestionSourceBase):
                 **self.source_config.connection.consumer_config,
             }
         )
-        self.schema_registry_client = SchemaRegistryClient(
-            {
-                "url": self.source_config.connection.schema_registry_url,
-                **self.source_config.connection.schema_registry_config,
-            }
+        # Use the fully qualified name for SchemaRegistryClient to make it mock patchable for testing.
+        self.schema_registry_client = (
+            confluent_kafka.schema_registry.schema_registry_client.SchemaRegistryClient(
+                {
+                    "url": self.source_config.connection.schema_registry_url,
+                    **self.source_config.connection.schema_registry_config,
+                }
+            )
         )
         self.report = KafkaSourceReport()
         self.known_schema_registry_subjects: List[
